@@ -1,0 +1,87 @@
+<html>
+	<body>
+		<script language="javascript">
+            function FlowchartProcessor() {
+                this.onProcessingError;
+                
+                function reportProcessingError(errorMessage) {
+                    if (this.onProcessingError != null) {
+                        this.onProcessingError(description);
+                    }                    
+                }
+                
+                function internalParseComponent(typeDescription) {
+                    var tokens = typeDescription.split(":", 3);
+                    
+                    if (tokens.length != 3) {
+                        reportProcessingError("'" + typeDescription + "' is not a valid flowchart component description (not enough parameters).");                        
+                    } else {
+                        var typeAndId = tokens[0].match("^(t|io|pp|p|prep|onpc|offpc|c)([0-9]+)")
+                        if (typeAndId.length != 3) {
+                            reportProcessingError("'" + tokens[0] +  "' in '" + typeDescription + "' is not a valid flowchart component description (expected type and id).");
+                        } else if (typeAndId[1] == "t") {
+                            alert("hoooray!");
+                        }
+                    }
+                }
+                
+                function internalParse(description) {
+                    if (description == null) {
+                        reportProcessingError("The flowchart description is empty.");                        
+                    } else if(typeof description != "string") {
+                        reportProcessingError("The flowchart description must be a string.");
+                    } else {
+                        var lines = description.split("\n");
+
+                        for (var i = 0; i < lines.length; i++) {
+                            internalParseComponent(lines[i]);
+                        }
+                    }
+                }
+                
+                this.processDescription = function(description) {
+                    internalParse(description);
+                }
+            }
+            
+            var flowchartProcessor = new FlowchartProcessor();
+            
+			function processText(controlId)
+			{
+				var control = document.getElementById(controlId);
+				
+				if(control != null)
+				{
+					flowchartProcessor.processDescription(control.value);
+				}
+			}
+		</script>
+	
+        <textarea id="inputArea" style="width:250px;height:150px;" onchange="processText('inputArea')"></textarea>
+    
+		<form id="flowchartDescriptionField" action="#">
+            <input id="statusBar" type="textarea" />
+		</form>
+        
+        <script>
+            flowchartProcessor.onProcessingError = function(errorMessage) {
+                document.getElementById('statusBar').value = errorMessage;
+            };
+                        
+        </script>
+	</body>
+</html>
+
+<!--
+
+t1:Start
+d
+io
+p
+pp
+prep
+onpc
+offpc
+c1:t1:io1:Yes
+
+-->
