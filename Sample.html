@@ -1,0 +1,53 @@
+<html>
+	<body>
+        <script src="Flowchart.js"></script>
+        
+		<script language="javascript">            
+            var flowchart = new Flowchart();
+            
+			function processText(controlId)
+			{
+				var control = document.getElementById(controlId);
+				
+				if(control != null)
+				{
+					flowchart.parse(control.value);
+				}
+			}
+		</script>
+	
+        <textarea id="inputArea" style="width:250px;height:150px;" onchange="processText('inputArea')"></textarea>
+    
+		<form id="flowchartDescriptionField" action="#">
+            <input id="statusBar" type="textarea" />
+		</form>
+        
+        <script>
+            Flowchart.onProcessingError = function(errorMessage) {
+                document.getElementById('statusBar').value = errorMessage;
+            };
+                        
+        </script>
+	</body>
+</html>
+
+<!--
+
+t1:Start
+d
+io
+p
+pp
+prep
+onpc
+offpc
+c1:t1:io1:Yes
+
+sample:
+t1:start
+p1:Make things a little different
+c1:t1:p1:
+t2:end
+c2:p1:t2:
+
+-->
