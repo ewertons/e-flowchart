@@ -9,9 +9,16 @@
 			{
 				var control = document.getElementById(controlId);
 				
-				if(control != null)
-				{
-					flowchart.parse(control.value);
+				if(control != null && flowchart.parse(control.value)) {
+                    var canvas = flowchart.plot();
+                    
+                    var plottingArea = document.getElementById("plottingArea");
+                    
+                    while (plottingArea.firstChild) {
+                        plottingArea.removeChild(plottingArea.firstChild);
+                    }
+                    
+                    plottingArea.appendChild(canvas);
 				}
 			}
 		</script>
@@ -21,6 +28,8 @@
 		<form id="flowchartDescriptionField" action="#">
             <input id="statusBar" type="textarea" />
 		</form>
+        
+        <div id="plottingArea"></div>
         
         <script>
             Flowchart.onProcessingError = function(errorMessage) {

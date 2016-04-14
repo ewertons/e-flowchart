@@ -19,6 +19,10 @@ function Connector(id, from, to, text) {
     this.text = text;
 }
 
+function PlottingOptions() {
+    
+}
+
 function Flowchart() {
     this.components;
     this.onProcessingError;
@@ -29,7 +33,40 @@ function Flowchart() {
         }                    
     }
     
-    function parseComponent(typeDescription) {
+    function getComponentSymbol(component) {
+        var symbol = null;
+        
+        var typeOfComponent  = component.constructor.name;
+        
+        if (typeOfComponent == "Terminal") {
+            symbol = "t";
+        } else if (typeOfComponent == "PreDefinedProcess") {
+            symbol = "pp";
+        } else if (typeOfComponent == "Process") {
+            symbol = "p";
+        } else if (typeOfComponent == "Connector") {
+            symbol = "c";
+        }
+        
+        return symbol;        
+    }
+    
+    function findComponent(symbolAndId, components) {
+        var component = null;
+        
+        if (components != null) {
+            for (var i = 0; i < components.length; i++) {
+                if (getComponentSymbol(components[i]) + components[i].id == symbolAndId) {
+                    component = components[i];
+                    break;
+                }
+            }            
+        }
+        
+        return component;
+    }
+    
+    function parseComponent(typeDescription, existingComponents) {
         var tokens = typeDescription.split(":", 2);
         
         var component = null;
@@ -60,7 +97,16 @@ function Flowchart() {
                 if (tokens.length != 4) {
                     reportProcessingError("'" + typeAndId[1] +  "' in '" + typeDescription + "' is not a valid flowchart component description (incomplete description).");
                 } else {
-                    component = new Connector(typeAndId[2], tokens[1], tokens[2], tokens[3]);
+                    var fromComponent = findComponent(tokens[1], existingComponents);
+                    var toComponent = findComponent(tokens[2], existingComponents);
+                    
+                    if (fromComponent == null) {
+                        reportProcessingError("'" + tokens[1] +  "' in '" + typeDescription + "' is not a valid flowchart component description (connector 'from' element not found).");
+                    } else if (toComponent == null) {
+                        reportProcessingError("'" + tokens[2] +  "' in '" + typeDescription + "' is not a valid flowchart component description (connector 'to' element not found).");
+                    } else {
+                        component = new Connector(typeAndId[2], fromComponent, toComponent, tokens[3]);                    
+                    } 
                 }
             } else {
                 reportProcessingError("'" + typeAndId[1] +  "' in '" + typeDescription + "' is not a valid flowchart component description (unexpected type).");
@@ -81,7 +127,7 @@ function Flowchart() {
             var lines = description.split("\n");
 
             for (var i = 0; i < lines.length; i++) {
-                var component = parseComponent(lines[i]);
+                var component = parseComponent(lines[i], components);
                 
                 if (component != null) {
                     components.push(component);
@@ -100,5 +146,16 @@ function Flowchart() {
         }
         
         return isFlowchartUpdated;
+    }
+    
+    this.plot = function() {
+        var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext('2d');
+
+        for(var i = 0; i < this.components.length; i++) {
+            ctx.fillRect(5, 5 + 50 * i, 50 + 10 * i, 20);            
+        }
+
+        return canvas;
     }
 }
