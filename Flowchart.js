@@ -1,18 +1,29 @@
+var FlowchartComponentTypes = {
+	Terminal : "Terminal",
+	Process : "Process",
+	PreDefinedProcess : "PreDefinedProcess",
+	Connector : "Connector"
+}
+
 function Terminal(id, text) {
+	this.type = FlowchartComponentTypes.Terminal;
     this.id = id;
     this.text = text;
 }
 
 function Process(id, text) {
+	this.type = FlowchartComponentTypes.Process;
     this.id = id;
     this.text = text;
 }
 
 function PreDefinedProcess(id, text) {
+	this.type = FlowchartComponentTypes.PreDefinedProcess;
     this.id = id;
     this.text = text;
 }
 function Connector(id, from, to, text) {
+	this.type = FlowchartComponentTypes.Connector;
     this.id = id;
     this.from = from;
     this.to = to;
@@ -148,14 +159,43 @@ function Flowchart() {
         return isFlowchartUpdated;
     }
     
+    function PlottingRequirements() {
+        this.width;
+        this.height;
+    }
+    
+    function getComponentPlottingRequirements(component) {
+    }
+    
     this.plot = function() {
         var canvas = document.createElement("canvas");
         var ctx = canvas.getContext('2d');
 
+		
         for(var i = 0; i < this.components.length; i++) {
-            ctx.fillRect(5, 5 + 50 * i, 50 + 10 * i, 20);            
+			
+			if (this.components[i].type == FlowchartComponentTypes.Terminal) {
+				ctx.fillRect(5, 5 + 50 * i, 50, 20);
+			} else if (this.components[i].type == FlowchartComponentTypes.Process) {
+				ctx.fillRect(5, 5 + 50 * i, 100, 20);
+			} else if (this.components[i].type == FlowchartComponentTypes.PreDefinedProcess) {
+				ctx.fillRect(5, 5 + 50 * i, 200, 20);
+			} else if (this.components[i].type == FlowchartComponentTypes.Connector) {
+				ctx.fillRect(5, 5 + 50 * i, 400, 20);
+			}
+			
+				
         }
 
         return canvas;
     }
+    
+    // if connection is to component above, and
+    // I. component can be placed side-by-side of last (to the side of the component connected to) and have 
+    // a. there is one or more components above, connection line starts on sides;
+    // b. there is no other component above, connection line starts from top;
+    
+    // if connection is to component below, and
+    // a. there is one or more components below, connection line starts on sides;
+    // b. there is no other component below, connection line starts from bottom;
 }
